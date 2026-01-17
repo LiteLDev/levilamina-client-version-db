@@ -39,7 +39,7 @@ SHORT_TAG="${TAG#v}"
 RUNTIME_VERSION="${CLIENT_BRD_VERSION%%-*}"
 
 TMP_FILE=$(mktemp)
-jq --arg tag "${SHORT_TAG}" --arg ver "${RUNTIME_VERSION}" '.versions[$tag]=$ver' "${DB_FILE}" > "${TMP_FILE}"
+jq --arg tag "${SHORT_TAG}" --arg ver "${RUNTIME_VERSION}" '.versions[$ver] = ((.versions[$ver] // []) + [$tag] | unique)' "${DB_FILE}" > "${TMP_FILE}"
 mv "${TMP_FILE}" "${DB_FILE}"
 
 echo "Updated ${DB_FILE} with ${SHORT_TAG}: ${RUNTIME_VERSION}"
