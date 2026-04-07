@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-DB_FILE="${SCRIPT_DIR}/version-db.json"
+DB_FILE="${SCRIPT_DIR}/v2/version-db.json"
 REPO="LiteLDev/LeviLamina"
 
 command -v curl >/dev/null 2>&1 || { echo "curl is required" >&2; exit 1; }
@@ -36,10 +36,10 @@ if [[ -z "${CLIENT_BRD_VERSION}" ]]; then
 fi
 
 SHORT_TAG="${TAG#v}"
-RUNTIME_VERSION="${CLIENT_BRD_VERSION%%-*}"
+RUNTIME_VERSION=$(echo "${CLIENT_BRD_VERSION%%-*}" | sed 's/\.\([0-9]\+\)$/.0\1/')
 
 TMP_FILE=$(mktemp)
-jq --arg tag "${SHORT_TAG}" --arg ver "${RUNTIME_VERSION}" '.versions[$ver] = ((.versions[$ver] // []) + [$tag] | unique)' "${DB_FILE}" > "${TMP_FILE}"
+jq --arg tag "${SHORT_TAG}" --arg ver "1.${RUNTIME_VERSION}" '.versions[$ver] = ((.versions[$ver] // []) + [$tag] | unique)' "${DB_FILE}" > "${TMP_FILE}"
 mv "${TMP_FILE}" "${DB_FILE}"
 
 echo "Updated ${DB_FILE} with ${SHORT_TAG}: ${RUNTIME_VERSION}"
