@@ -30,6 +30,7 @@ jobs:
           if git diff --quiet; then
             exit 0
           fi
+          cp v2/version-db.json version-db.json
           git add .
           git commit -m "Update version db"
           git push origin HEAD
