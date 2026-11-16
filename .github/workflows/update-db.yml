@@ -2,6 +2,11 @@ name: Update version db
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: LeviLamina tag to add, e.g. v26.60.8 (default the highest version tag)
+        required: false
+        type: string
   repository_dispatch:
     types: [update-db]
 
@@ -18,6 +23,9 @@ jobs:
           fetch-depth: 0
 
       - name: Run update script
+        env:
+          # The release workflow of LeviLamina sends the tag it published in client_payload.
+          TAG: ${{ github.event.client_payload.tag || inputs.tag }}
         run: bash ./update-db.sh
 
       - name: Configure git
